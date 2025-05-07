@@ -27,6 +27,8 @@ interface AppContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  isOpeningFile: boolean;
+  isSavingFile: boolean;
   openNote: (noteId: string) => void;
   closeTab: (tabId: string) => void;
   setActiveTab: (tabId: string) => void;
@@ -54,6 +56,8 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isOpeningFile, setIsOpeningFile] = useState(false);
+  const [isSavingFile, setIsSavingFile] = useState(false);
   const saveTimeoutRef = useRef<{ [key: string]: number }>({});
 
   useEffect(() => {
@@ -107,6 +111,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const openNote = async (noteId: string) => {
     try {
       setError(null);
+      setIsOpeningFile(true);
       const existingTab = tabs.find((tab) => tab.note.id === noteId);
       
       if (existingTab) {
@@ -143,6 +148,8 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     } catch (error) {
       console.error('Error opening note:', error);
       setError('Failed to open note');
+    } finally {
+      setIsOpeningFile(false);
     }
   };
 
@@ -196,6 +203,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     saveTimeoutRef.current[noteId] = window.setTimeout(async () => {
       try {
         setError(null);
+        setIsSavingFile(true);
         await saveFileContent(noteId, content);
 
         setNotes(
@@ -214,6 +222,8 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       } catch (error) {
         console.error('Error updating note content:', error);
         setError('Failed to save note');
+      } finally {
+        setIsSavingFile(false);
       }
     }, 1000);
   }, [notes, tabs]);
@@ -275,6 +285,8 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         isAuthenticated,
         isLoading,
         error,
+        isOpeningFile,
+        isSavingFile,
         openNote,
         closeTab,
         setActiveTab,

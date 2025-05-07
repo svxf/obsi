@@ -2,17 +2,19 @@ import React, { useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import LeftSidebar from './LeftSidebar';
 import RightSidebar from './RightSidebar';
-import Editor from './Editor';
 import Toolbar from './Toolbar';
 import TabBar from './TabBar';
 import CommandPalette from './CommandPalette';
 import E from './E';
+import LoadingIndicator from './LoadingIndicator';
 
 const Layout: React.FC = () => {
   const { 
     leftSidebarOpen, 
     rightSidebarOpen, 
     activeTab, 
+    isOpeningFile,
+    isSavingFile,
     commandPaletteOpen,
     toggleCommandPalette
   } = useAppContext();
@@ -50,12 +52,28 @@ const Layout: React.FC = () => {
         <div className="flex-1 flex flex-col overflow-hidden">
           <TabBar />
           <div className="flex-1 overflow-auto">
+            {isOpeningFile && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 z-10">
+                <div className="flex flex-col items-center gap-2">
+                  <LoadingIndicator size="large" />
+                  <p className="text-white-600">Opening file...</p>
+                </div>
+              </div>
+            )}
+
             {activeTab ? (
               <E note={activeTab.note}/>
               // <Editor note={activeTab.note} />
             ) : (
               <div className="flex items-center justify-center h-full text-gray-500">
                 <p>No note open</p>
+              </div>
+            )}
+
+            {isSavingFile && (
+              <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-[#252525] px-3 py-2 rounded-lg shadow-md">
+                <LoadingIndicator size="small" />
+                <span className="text-sm text-white-600">Saving...</span>
               </div>
             )}
           </div>
