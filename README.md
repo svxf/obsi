@@ -1,6 +1,6 @@
 # obsi
  
-a **markup text editor** that uses google drive's api to get and save documents
+a **[WYSIWYG Markdown editor](https://milkdown.dev/)** that uses google drive's api to get & save documents, and also uses 
 
 i made this because google doc sucks on chromebook and this made it just a bit better 👍
 
