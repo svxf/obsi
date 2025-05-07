@@ -9,7 +9,7 @@ interface EditorProps {
   note: Note;
 }
 
-const E: React.FC<EditorProps> = ({ note }) => {
+const Editor: React.FC<EditorProps> = ({ note }) => {
   const { updateNoteContent } = useAppContext();
   const [content, setContent] = useState(note.content);
 
@@ -53,4 +53,4 @@ const E: React.FC<EditorProps> = ({ note }) => {
   );
 };
 
-export default E;
+export default Editor;

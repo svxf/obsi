@@ -5,8 +5,8 @@ import RightSidebar from './RightSidebar';
 import Toolbar from './Toolbar';
 import TabBar from './TabBar';
 import CommandPalette from './CommandPalette';
-import E from './E';
 import LoadingIndicator from './LoadingIndicator';
+import Editor from './Editor';
 
 const Layout: React.FC = () => {
   const { 
@@ -62,8 +62,7 @@ const Layout: React.FC = () => {
             )}
 
             {activeTab ? (
-              <E note={activeTab.note}/>
-              // <Editor note={activeTab.note} />
+              <Editor note={activeTab.note}/>
             ) : (
               <div className="flex items-center justify-center h-full text-gray-500">
                 <p>No note open</p>
