@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { initializeGoogleDrive, listFiles, getFileContent, saveFileContent, createFile, clearAuthToken } from '../services/googleDrive';
 
 export interface Note {
@@ -54,6 +54,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const saveTimeoutRef = useRef<{ [key: string]: number }>({});
 
   useEffect(() => {
     const init = async () => {
@@ -187,28 +188,52 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setCommandPaletteOpen(!commandPaletteOpen);
   };
 
-  const updateNoteContent = async (noteId: string, content: string) => {
-    try {
-      setError(null);
-      await saveFileContent(noteId, content);
-
-      setNotes(
-        notes.map((note) =>
-          note.id === noteId ? { ...note, content, lastModified: new Date().toISOString() } : note
-        )
-      );
-
-      setTabs(
-        tabs.map((tab) =>
-          tab.note.id === noteId
-            ? { ...tab, note: { ...tab.note, content, lastModified: new Date().toISOString() } }
-            : tab
-        )
-      );
-    } catch (error) {
-      console.error('Error updating note content:', error);
-      setError('Failed to save note');
+  const debouncedSave = useCallback((noteId: string, content: string) => {
+    if (saveTimeoutRef.current[noteId]) {
+      clearTimeout(saveTimeoutRef.current[noteId]);
     }
+
+    saveTimeoutRef.current[noteId] = window.setTimeout(async () => {
+      try {
+        setError(null);
+        await saveFileContent(noteId, content);
+
+        setNotes(
+          notes.map((note) =>
+            note.id === noteId ? { ...note, content, lastModified: new Date().toISOString() } : note
+          )
+        );
+
+        setTabs(
+          tabs.map((tab) =>
+            tab.note.id === noteId
+              ? { ...tab, note: { ...tab.note, content, lastModified: new Date().toISOString() } }
+              : tab
+          )
+        );
+      } catch (error) {
+        console.error('Error updating note content:', error);
+        setError('Failed to save note');
+      }
+    }, 1000);
+  }, [notes, tabs]);
+
+  const updateNoteContent = async (noteId: string, content: string) => {
+    setNotes(
+      notes.map((note) =>
+        note.id === noteId ? { ...note, content, lastModified: new Date().toISOString() } : note
+      )
+    );
+
+    setTabs(
+      tabs.map((tab) =>
+        tab.note.id === noteId
+          ? { ...tab, note: { ...tab.note, content, lastModified: new Date().toISOString() } }
+          : tab
+      )
+    );
+
+    debouncedSave(noteId, content);
   };
 
   const createNewNote = async (title: string, content: string) => {
@@ -230,6 +255,12 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setTabs([]);
     setActiveTabState(null);
   };
+
+  useEffect(() => {
+    return () => {
+      Object.values(saveTimeoutRef.current).forEach(timeout => clearTimeout(timeout));
+    };
+  }, []);
 
   return (
     <AppContext.Provider

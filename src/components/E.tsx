@@ -27,7 +27,7 @@ const E: React.FC<EditorProps> = ({ note }) => {
       });
 
       crepeInstance.on((listener) => {
-        listener.updated((_ctx, doc, _prevDoc) => {
+        listener.updated((_ctx, _doc, _prevDoc) => {
           updateNoteContent(note.id, crepeInstance.getMarkdown());
         });
       })

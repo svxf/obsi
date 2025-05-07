@@ -9,8 +9,6 @@ const DISCOVERY_DOCS = [
 const SCOPES = 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/documents';
 
 let tokenClient: google.accounts.oauth2.TokenClient | null = null;
-let gapiInited = false;
-let gisInited = false;
 let accessToken: string | null = null;
 
 export const initializeGoogleDrive = async () => {
@@ -37,7 +35,6 @@ export const initializeGoogleDrive = async () => {
           apiKey: API_KEY,
           discoveryDocs: DISCOVERY_DOCS,
         });
-        gapiInited = true;
         resolve();
       });
     });
@@ -47,7 +44,6 @@ export const initializeGoogleDrive = async () => {
       scope: SCOPES,
       callback: '',
     });
-    gisInited = true;
 
     const storedToken = localStorage.getItem('googleDriveAccessToken');
     if (storedToken) {
