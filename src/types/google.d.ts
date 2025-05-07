@@ -1,11 +1,13 @@
 declare namespace gapi {
+  function load(api: string, callback: () => void): void;
+
   namespace client {
     function init(config: {
       apiKey: string;
       discoveryDocs: string[];
     }): Promise<void>;
 
-    function load(api: string, callback: () => void): void;
+    function setToken(token: { access_token: string } | null): void;
 
     function request<T>(config: {
       path: string;
@@ -58,7 +60,7 @@ declare namespace gapi {
             name: string;
             mimeType: string;
           };
-          media: {
+          media?: {
             mimeType: string;
             body: string;
           };
@@ -68,6 +70,60 @@ declare namespace gapi {
             id?: string;
             name?: string;
             modifiedTime?: string;
+          };
+        }>;
+      }
+    }
+
+    namespace docs {
+      namespace documents {
+        interface DocumentContent {
+          body: {
+            content: Array<{
+              endIndex: number;
+              startIndex: number;
+              paragraph?: {
+                elements: Array<{
+                  endIndex: number;
+                  startIndex: number;
+                  textRun?: {
+                    content: string;
+                  };
+                }>;
+              };
+            }>;
+          };
+          documentId: string;
+          title: string;
+        }
+
+        function get(params: {
+          documentId: string;
+        }): Promise<{
+          result: DocumentContent;
+        }>;
+
+        function batchUpdate(params: {
+          documentId: string;
+          resource: {
+            requests: Array<{
+              deleteContentRange?: {
+                range: {
+                  startIndex: number;
+                  endIndex: number;
+                };
+              };
+              insertText?: {
+                location: {
+                  index: number;
+                };
+                text: string;
+              };
+            }>;
+          };
+        }): Promise<{
+          result: {
+            documentId: string;
           };
         }>;
       }

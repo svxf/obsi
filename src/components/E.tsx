@@ -10,6 +10,7 @@ interface EditorProps {
 }
 
 const E: React.FC<EditorProps> = ({ note }) => {
+  const { updateNoteContent } = useAppContext();
   const [content, setContent] = useState(note.content);
 
   const editorRef = useRef<HTMLDivElement | null>(null);
@@ -24,6 +25,12 @@ const E: React.FC<EditorProps> = ({ note }) => {
       crepeInstance.create().then(() => {
         console.log("Editor created");
       });
+
+      crepeInstance.on((listener) => {
+        listener.updated((_ctx, doc, _prevDoc) => {
+          updateNoteContent(note.id, crepeInstance.getMarkdown());
+        });
+      })
 
       return () => {
         crepeInstance.destroy().then(() => {

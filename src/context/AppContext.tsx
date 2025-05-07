@@ -1,24 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { initializeGoogleDrive, listFiles, getFileContent, saveFileContent, createFile } from '../services/googleDrive';
-
-const sampleNotes = [
-  {
-    id: '1',
-    title: 'Welcome to Obsi',
-    content: '# Welcome to Obsi\n\nObsi uses Markdown files.\n\n## Quick start\n\n- [[Basic Formatting]]\n- [[Embed files]]\n- [[Create notes]]\n\n## Advanced\n\n- [[Graph view]]\n- [[Workspaces]]\n- [[Search]]\n',
-    path: 'Welcome to Obsi.md',
-    folder: '',
-    lastModified: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    title: 'Basic Formatting',
-    content: '# Basic Formatting\n\nObsi uses Markdown for formatting.\n\n## Headers\n\n# Header 1\n## Header 2\n### Header 3\n\n## Lists\n- Item 1\n- Item 2\n\n1. Numbered item 1\n2. Numbered item 2\n\n## Formatting\n**Bold text**\n*Italic text*\n~~Strikethrough~~\n\n> This is a quote\n\n`code`\n\n```js\nconsole.log("Code block");\n```\n',
-    path: 'Basic Formatting.md',
-    folder: '',
-    lastModified: new Date().toISOString(),
-  },
-];
+import { initializeGoogleDrive, listFiles, getFileContent, saveFileContent, createFile, clearAuthToken } from '../services/googleDrive';
 
 export interface Note {
   id: string;
@@ -57,6 +38,7 @@ interface AppContextType {
   createNewNote: (title: string, content: string) => Promise<void>;
   authenticate: () => Promise<void>;
   refreshFiles: () => Promise<void>;
+  logout: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -77,6 +59,11 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const init = async () => {
       try {
         await initializeGoogleDrive();
+        const hasToken = localStorage.getItem('googleDriveAccessToken');
+        if (hasToken) {
+          await refreshFiles();
+          setIsAuthenticated(true);
+        }
         setIsLoading(false);
       } catch (error) {
         console.error('Error initializing Google Drive:', error);
@@ -200,21 +187,17 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setCommandPaletteOpen(!commandPaletteOpen);
   };
 
-  // todo: redo this
   const updateNoteContent = async (noteId: string, content: string) => {
     try {
       setError(null);
-      // update in Google Drive
       await saveFileContent(noteId, content);
 
-      // Update local state
       setNotes(
         notes.map((note) =>
           note.id === noteId ? { ...note, content, lastModified: new Date().toISOString() } : note
         )
       );
 
-      // update in tabs
       setTabs(
         tabs.map((tab) =>
           tab.note.id === noteId
@@ -238,6 +221,14 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       console.error('Error creating new note:', error);
       setError('Failed to create new note');
     }
+  };
+
+  const logout = () => {
+    clearAuthToken();
+    setIsAuthenticated(false);
+    setNotes([]);
+    setTabs([]);
+    setActiveTabState(null);
   };
 
   return (
@@ -264,6 +255,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         createNewNote,
         authenticate,
         refreshFiles,
+        logout,
       }}
     >
       {children}

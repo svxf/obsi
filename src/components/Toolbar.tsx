@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Menu, FileText, Grape as Graph, Search, ChevronLeft, ChevronRight, LayoutPanelLeft, PanelRight as LayoutPanelRight } from 'lucide-react';
+import { Menu, FileText, Grape as Graph, Search, ChevronLeft, ChevronRight, LayoutPanelLeft, PanelRight as LayoutPanelRight, Circle } from 'lucide-react';
 
 const Toolbar: React.FC = () => {
   const { 
@@ -8,7 +8,9 @@ const Toolbar: React.FC = () => {
     rightSidebarOpen, 
     toggleLeftSidebar, 
     toggleRightSidebar,
-    toggleCommandPalette
+    toggleCommandPalette,
+    createNewNote,
+    logout
   } = useAppContext();
   
   return (
@@ -22,7 +24,11 @@ const Toolbar: React.FC = () => {
           <Menu size={16} className="text-gray-500" />
         </button>
         
-        <button className="p-1 rounded hover:bg-[#2a2a2a]">
+        {/* temporary new note button */}
+        <button 
+          className="p-1 rounded hover:bg-[#2a2a2a]"
+          onClick={() => createNewNote('test', 'emp')}
+        >
           <FileText size={16} className="text-gray-500" />
         </button>
         
@@ -63,6 +69,14 @@ const Toolbar: React.FC = () => {
           onClick={toggleRightSidebar}
         >
           <LayoutPanelRight size={16} className={rightSidebarOpen ? 'text-[#a47ddc]' : 'text-gray-500'} />
+        </button>
+
+        {/* temporary logout button */}
+        <button 
+          className={`p-1 rounded hover:bg-[#2a2a2a] ${rightSidebarOpen ? 'bg-[#2a2a2a]' : ''}`}
+          onClick={logout}
+        >
+          <Circle size={16} />
         </button>
       </div>
     </div>
