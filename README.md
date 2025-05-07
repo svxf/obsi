@@ -4,7 +4,7 @@ a online **[WYSIWYG Markdown editor](https://milkdown.dev/)** that uses google d
 
 i made this because google doc sucks on chromebook and this made it just a bit better 👍
 
-inspired off of [obsidian](https://obsidian.md/)
+inspired off of [obsidian.md](https://obsidian.md/)
 
 there is still missing some stuff and a lot of the buttons don't work (maybe ill add it later?? idk..), but the main functionality is there. you can login with your google account, open up google docs and edit them and they will automatically save and yeah.
 
