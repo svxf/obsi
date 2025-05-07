@@ -8,6 +8,8 @@ inspired off of [obsidian](https://obsidian.md/)
 
 there is still missing some stuff and a lot of the buttons don't work (maybe ill add it later?? idk..), but the main functionality is there. you can login with your google account, open up google docs and edit them and they will automatically save and yeah.
 
+demo: https://obsi-svxf.netlify.app/
+
 ---
 ![image](https://github.com/user-attachments/assets/14e2e5a6-c6ab-4342-b11a-ba4135bb1e13)
 ![image](https://github.com/user-attachments/assets/9061ec12-2356-4a4e-9862-2d3caec931c8)
