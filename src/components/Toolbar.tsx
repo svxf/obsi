@@ -71,12 +71,16 @@ const Toolbar: React.FC = () => {
           <LayoutPanelRight size={16} className={rightSidebarOpen ? 'text-[#a47ddc]' : 'text-gray-500'} />
         </button>
 
-        {/* temporary logout button */}
-        <button 
-          className={`p-1 rounded hover:bg-[#2a2a2a] ${rightSidebarOpen ? 'bg-[#2a2a2a]' : ''}`}
+        <button
           onClick={logout}
+          className="flex items-center justify-center w-8 h-8 rounded-full overflow-hidden hover:bg-gray-100 transition-colors"
+          title={'Logout'}
         >
-          <Circle size={16} />
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+            <span className="text-gray-500 text-sm">
+              ?
+            </span>
+          </div>
         </button>
       </div>
     </div>

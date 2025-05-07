@@ -19,6 +19,7 @@ export interface Tab {
 interface AppContextType {
   notes: Note[];
   tabs: Tab[];
+  noteContent: string;
   activeTab: Tab | null;
   leftSidebarOpen: boolean;
   rightSidebarOpen: boolean;
@@ -31,6 +32,7 @@ interface AppContextType {
   isSavingFile: boolean;
   openNote: (noteId: string) => void;
   closeTab: (tabId: string) => void;
+  setNoteContent: (content: string) => void;
   setActiveTab: (tabId: string) => void;
   toggleLeftSidebar: () => void;
   toggleRightSidebar: () => void;
@@ -48,6 +50,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [tabs, setTabs] = useState<Tab[]>([]);
+  const [noteContent, setNoteContent] = useState('');
   const [activeTab, setActiveTabState] = useState<Tab | null>(null);
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
@@ -168,6 +171,8 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setActiveTabState(null);
     }
 
+    setNoteContent(activeTab?.note.content || '');
+
     setTabs(newTabs);
   };
 
@@ -181,6 +186,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     
     setTabs(updatedTabs);
     setActiveTabState(activeTab || null);
+    setNoteContent(activeTab?.note.content || '');
   };
 
   const toggleLeftSidebar = () => {
@@ -206,19 +212,19 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setIsSavingFile(true);
         await saveFileContent(noteId, content);
 
-        setNotes(
-          notes.map((note) =>
-            note.id === noteId ? { ...note, content, lastModified: new Date().toISOString() } : note
-          )
-        );
+        // setNotes(
+        //   notes.map((note) =>
+        //     note.id === noteId ? { ...note, content, lastModified: new Date().toISOString() } : note
+        //   )
+        // );
 
-        setTabs(
-          tabs.map((tab) =>
-            tab.note.id === noteId
-              ? { ...tab, note: { ...tab.note, content, lastModified: new Date().toISOString() } }
-              : tab
-          )
-        );
+        // setTabs(
+        //   tabs.map((tab) =>
+        //     tab.note.id === noteId
+        //       ? { ...tab, note: { ...tab.note, content, lastModified: new Date().toISOString() } }
+        //       : tab
+        //   )
+        // );
       } catch (error) {
         console.error('Error updating note content:', error);
         setError('Failed to save note');
@@ -242,6 +248,8 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           : tab
       )
     );
+
+    setNoteContent(content || '');
 
     debouncedSave(noteId, content);
   };
@@ -277,6 +285,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       value={{
         notes,
         tabs,
+        noteContent,
         activeTab,
         leftSidebarOpen,
         rightSidebarOpen,
@@ -289,6 +298,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         isSavingFile,
         openNote,
         closeTab,
+        setNoteContent,
         setActiveTab,
         toggleLeftSidebar,
         toggleRightSidebar,

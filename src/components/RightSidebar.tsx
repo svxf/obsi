@@ -3,10 +3,8 @@ import { useAppContext } from '../context/AppContext';
 import { FileText, List, Hash, Calendar, Tag, BookOpen } from 'lucide-react';
 
 const RightSidebar: React.FC = () => {
-  const { activeTab } = useAppContext();
+  const { noteContent } = useAppContext();
   
-  // todo: using milkdown now, make it so when milkdown changes this
-  // will automatically extract the heading in realtime
   const extractHeadings = (content: string) => {
     const headings: { level: number; text: string }[] = [];
     const lines = content.split('\n');
@@ -24,7 +22,7 @@ const RightSidebar: React.FC = () => {
     return headings;
   };
   
-  const headings = activeTab ? extractHeadings(activeTab.note.content) : [];
+  const headings = noteContent ? extractHeadings(noteContent) : [];
 
   return (
     <div className="h-full flex flex-col bg-[#1e1e1e] text-[#dcddde]">
@@ -45,7 +43,7 @@ const RightSidebar: React.FC = () => {
       
       {/* Content */}
       <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
-        {activeTab ? (
+        {noteContent ? (
           <>
             {headings.length > 0 ? (
               <div className="space-y-1">
